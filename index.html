@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NARCISSUS — couldn't stop looking at himself. now it's an app.</title>
+<meta name="description" content="$NARCISSUS paired with instagram. 3,000 years ago he leaned over a pool and never got up. we call it the front camera now.">
+<meta property="og:title" content="NARCISSUS — couldn't stop looking at himself. now it's an app.">
+<meta property="og:description" content="$NARCISSUS · paired with instagram. every buy is a like. followers = market cap.">
+<meta property="og:image" content="assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/pfp.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<style>
+  :root{--bg:#09090b;--bg2:#121216;--ink:#fff;--muted:#a3a3ad;--line:rgba(255,255,255,.12);--marble:#f1eee8;--marble2:#dcd7ce;--ig:linear-gradient(45deg,#f9ce34,#ee2a7b 55%,#6228d7);--pink:#ee2a7b;--mx:50vw;--my:50vh}
+  *{box-sizing:border-box}
+  html{overflow-x:clip}
+  html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:16px;line-height:1.5;overflow-x:clip;cursor:none}
+  @media(pointer:coarse){body{cursor:auto}}
+  a{color:inherit;text-decoration:none}
+  h1,h2{font-family:"Instrument Serif",Georgia,serif;font-weight:400;margin:0;line-height:.95;letter-spacing:-.01em}
+  h1 i,h2 i{font-style:italic;background:var(--ig);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ig)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:12px;background:#fff;color:#000;font-weight:800;font-size:15px;letter-spacing:.01em;position:relative;will-change:transform;transition:transform .15s;border:0;cursor:none}
+  .btn.ig{background:var(--ig);color:#fff;box-shadow:0 12px 40px rgba(238,42,123,.35)}
+  .btn.ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid var(--line)}
+  .btn.dark{background:#111;color:#fff}
+
+  /* ===== fixed layers ===== */
+  #dim{position:fixed;inset:0;pointer-events:none;z-index:850;background:radial-gradient(circle 420px at var(--mx) var(--my),rgba(0,0,0,0) 0%,rgba(0,0,0,.16) 60%,rgba(0,0,0,.26) 100%);transition:opacity .4s}
+  @media(pointer:coarse){#dim{display:none}}
+  #cur{position:fixed;left:0;top:0;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 18px 4px rgba(255,255,255,.55),inset 0 0 10px rgba(255,255,255,.6);pointer-events:none;z-index:1000;display:grid;place-items:center;transition:width .2s,height .2s,margin .2s;will-change:transform}
+  #cur::after{content:"♥";font-size:0;color:var(--pink);transition:font-size .2s;line-height:1}
+  #cur.big{width:64px;height:64px;margin:-32px 0 0 -32px}#cur.big::after{font-size:22px}
+  @media(pointer:coarse){#cur{display:none}}
+  .heart{position:fixed;left:0;top:0;pointer-events:none;z-index:960;font-size:22px;color:var(--pink);text-shadow:0 0 12px rgba(238,42,123,.6);will-change:transform,opacity}
+  .bigheart{position:fixed;left:0;top:0;pointer-events:none;z-index:961;font-size:120px;color:#fff;text-shadow:0 0 40px rgba(0,0,0,.5);transform:translate(-50%,-50%) scale(0);will-change:transform,opacity}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,160%);opacity:0;background:#fff;color:#000;padding:12px 18px;font-weight:700;font-size:14px;border-radius:999px;z-index:930;transition:transform .5s cubic-bezier(.2,1.4,.4,1),opacity .3s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .toast.on{transform:translate(-50%,0);opacity:1}
+
+  /* ===== intro: ring light on ===== */
+  #on{position:fixed;inset:0;z-index:960;background:#000;display:grid;place-items:center;overflow:hidden}
+  #on .ring{width:min(78vmin,620px);aspect-ratio:1;border-radius:50%;border:26px solid #fff;box-shadow:0 0 80px 30px rgba(255,255,255,.35),inset 0 0 60px rgba(255,255,255,.5);opacity:0;display:grid;place-items:center}
+  #on .ring img{width:64%;aspect-ratio:1;border-radius:50%;object-fit:cover;filter:brightness(.15);transform:scale(.9)}
+  #on .t{position:absolute;bottom:8vh;left:0;right:0;text-align:center;font-family:"Instrument Serif",serif;font-style:italic;font-size:clamp(22px,3vw,34px);color:#777;opacity:0}
+  #on .skip{position:absolute;top:24px;right:28px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#555}
+
+  /* ===== nav ===== */
+  nav{position:fixed;left:0;right:0;top:0;z-index:800;display:flex;align-items:center;gap:16px;padding:14px 28px;background:linear-gradient(180deg,rgba(9,9,11,.9),rgba(9,9,11,0));pointer-events:none}
+  nav>*{pointer-events:auto}
+  nav .logo{font-family:"Instrument Serif",serif;font-style:italic;font-size:30px;letter-spacing:-.02em}
+  nav .links{margin-left:auto;display:flex;gap:22px;font-size:13px;font-weight:600;color:#ddd}
+  nav .links a:hover{color:#fff}
+  @media(max-width:700px){nav .links{display:none}}
+
+  /* ===== profile hero ===== */
+  #profile{position:relative;min-height:100svh;padding:120px 0 80px;overflow:hidden;background:radial-gradient(circle at 30% 30%,#1a1a20,var(--bg) 60%)}
+  #profile .glow{position:absolute;left:18%;top:26%;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 60%);pointer-events:none;filter:blur(10px)}
+  .ph{display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:center}
+  .avatar{position:relative;width:clamp(170px,22vw,260px);aspect-ratio:1;border-radius:50%;padding:7px;background:var(--ig);cursor:none;transform-style:preserve-3d}
+  .avatar::before{content:"";position:absolute;inset:-14px;border-radius:50%;background:conic-gradient(from 0deg,#f9ce34,#ee2a7b,#6228d7,#f9ce34);opacity:.55;filter:blur(14px);animation:spin 6s linear infinite;z-index:-1}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:5px solid var(--bg);display:block}
+  .avatar .live{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--ig);color:#fff;font-size:11px;font-weight:900;letter-spacing:.12em;padding:4px 10px;border-radius:6px;border:3px solid var(--bg)}
+  .who{min-width:0}
+  .name{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .name h1{font-size:clamp(40px,5vw,64px);font-style:italic}
+  .vb{width:26px;height:26px;border-radius:50%;background:#0095f6;display:none;place-items:center;color:#fff;font-size:14px;font-weight:900;box-shadow:0 0 20px rgba(0,149,246,.7)}
+  .vb.on{display:grid}
+  .acts{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .acts .btn{padding:10px 20px;font-size:14px}
+  .stats{display:flex;gap:34px;margin:22px 0 16px;font-size:15px;color:var(--muted)}
+  .stats b{display:block;color:#fff;font-size:clamp(22px,2.6vw,34px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .bio{font-size:16px;color:#ddd;max-width:60ch;line-height:1.55}
+  .bio b{color:#fff}
+  .bio a{color:#9ecbff}
+  .hl{display:flex;gap:18px;margin-top:30px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+  .hl::-webkit-scrollbar{display:none}
+  .hl div{flex:0 0 auto;text-align:center;font-size:12px;color:#ddd;cursor:none}
+  .hl i{display:block;width:74px;height:74px;border-radius:50%;padding:3px;background:linear-gradient(#333,#333) padding-box,var(--ig) border-box;border:2px solid transparent;margin:0 auto 6px;overflow:hidden;transition:transform .2s}
+  .hl div:hover i{transform:scale(1.08)}
+  .hl img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+  @media(max-width:800px){.ph{grid-template-columns:1fr;gap:26px;text-align:center}.avatar{margin:0 auto}.name,.acts,.stats{justify-content:center}.bio{margin:0 auto}}
+  .big{margin-top:80px;position:relative}
+  .big h2{font-size:clamp(46px,8.2vw,124px);color:#fff}
+  .big h2 .w{display:inline-block;overflow:hidden;vertical-align:top;margin-right:.22em}
+  .big h2 .w span{display:inline-block;transform:translateY(110%)}
+  .big p{font-size:clamp(17px,1.5vw,21px);color:var(--muted);max-width:58ch;margin:22px 0 0}
+  .big p b{color:#fff;font-weight:600}
+
+  /* ===== marquee ===== */
+  .mq{background:var(--ig);color:#fff;overflow:hidden;white-space:nowrap;padding:12px 0;font-family:"Instrument Serif",serif;font-style:italic;font-size:clamp(22px,3vw,38px);position:relative;z-index:3}
+  .mq div{display:inline-flex;gap:44px;will-change:transform}
+
+  /* ===== the pool (reflection) ===== */
+  #pool{background:var(--marble);color:#111;padding:120px 0;position:relative;overflow:hidden}
+  #pool::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(0,0,0,.06),transparent 40%),radial-gradient(ellipse at 80% 90%,rgba(0,0,0,.08),transparent 45%);pointer-events:none}
+  #pool .grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:60px;align-items:center;position:relative}
+  #pool .tag{color:#666}
+  #pool h2{font-size:clamp(44px,5.6vw,84px);color:#111}
+  #pool p{font-size:clamp(17px,1.4vw,20px);color:#444;max-width:50ch;margin:18px 0 0}
+  #pool p b{color:#111}
+  .mirror{position:relative;width:100%;max-width:520px;margin:0 auto;box-shadow:0 60px 120px rgba(0,0,0,.35);border-radius:6px;overflow:hidden;background:#000}
+  .mirror img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+  .mirror canvas{width:100%;height:auto;display:block;aspect-ratio:2/1;cursor:none}
+  .mirror .lbl{position:absolute;left:14px;bottom:12px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7);pointer-events:none}
+  @media(max-width:900px){#pool .grid{grid-template-columns:1fr}}
+
+  /* ===== followers (milestones) ===== */
+  #followers{background:var(--bg);padding:120px 0;position:relative;overflow:hidden}
+  #followers .grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+  #followers h2{font-size:clamp(44px,5.6vw,84px)}
+  #followers .lead{color:var(--muted);font-size:clamp(17px,1.4vw,20px);max-width:48ch;margin:18px 0 26px}
+  .fcount{font-size:clamp(64px,9vw,140px);font-weight:900;letter-spacing:-.04em;line-height:.9;background:var(--ig);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .fcount small{display:block;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);-webkit-text-fill-color:var(--muted);margin-top:10px;font-weight:700}
+  .notes{display:flex;flex-direction:column;gap:10px}
+  .note{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;transition:.3s}
+  .note img{width:44px;height:44px;border-radius:50%;object-fit:cover;filter:grayscale(1) brightness(.5)}
+  .note b{display:block;font-size:15px;color:#fff}
+  .note span{font-size:13px;color:var(--muted)}
+  .note .st{font-size:11px;font-weight:800;letter-spacing:.14em;padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .note.done img{filter:none}.note.done .st{background:#fff;color:#000;border-color:#fff}
+  .note.next{border-color:var(--pink);box-shadow:0 0 30px rgba(238,42,123,.2)}.note.next .st{background:var(--ig);color:#fff;border-color:transparent}
+  .whatif{margin-top:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+  .whatif input{flex:1;min-width:160px;accent-color:var(--pink)}
+  .whatif output{color:#fff;font-weight:800;min-width:60px}
+  .whatif button{background:transparent;border:1px solid var(--line);color:#fff;border-radius:999px;padding:6px 12px;font-size:12px;cursor:none}
+  @media(max-width:900px){#followers .grid{grid-template-columns:1fr}}
+
+  /* ===== grid (posts) ===== */
+  #posts{background:var(--bg);padding:20px 0 120px}
+  .tabs{display:flex;gap:40px;justify-content:center;border-top:1px solid var(--line);margin-bottom:10px}
+  .tabs span{padding:16px 0;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);border-top:1px solid transparent;margin-top:-1px}
+  .tabs span.on{color:#fff;border-top-color:#fff}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  @media(max-width:600px){.grid3{gap:3px}}
+  .post{position:relative;aspect-ratio:1;overflow:hidden;background:#111;cursor:none}
+  .post img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s;transform:scale(1.02)}
+  .post:hover img{transform:scale(1.1)}
+  .post .ov{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;gap:26px;font-weight:800;font-size:18px;opacity:0;transition:.25s}
+  .post:hover .ov{opacity:1}
+  .post .ov span::before{content:"♥ ";}
+  .post .ov span+span::before{content:"💬 ";}
+  .post .pin{position:absolute;right:10px;top:8px;font-size:18px;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+
+  /* ===== post modal ===== */
+  #pm{position:fixed;inset:0;z-index:945;background:rgba(0,0,0,.92);display:none;place-items:center;padding:30px}
+  #pm .box{display:grid;grid-template-columns:1.2fr .8fr;width:min(1100px,100%);max-height:90vh;background:#000;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  #pm .im{position:relative;background:#000;display:grid;place-items:center;min-height:300px;cursor:none}
+  #pm .im img{width:100%;height:100%;max-height:90vh;object-fit:contain;display:block}
+  #pm .side{display:flex;flex-direction:column;background:#0d0d10;min-height:0}
+  #pm .hd{display:flex;align-items:center;gap:10px;padding:14px;border-bottom:1px solid var(--line);font-weight:700;font-size:14px}
+  #pm .hd img{width:32px;height:32px;border-radius:50%;object-fit:cover;padding:2px;background:var(--ig)}
+  #pm .cm{padding:14px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:14px;font-size:14px}
+  #pm .cm div{display:flex;gap:10px;align-items:flex-start}
+  #pm .cm img{width:28px;height:28px;border-radius:50%;object-fit:cover;flex:0 0 auto}
+  #pm .cm b{margin-right:6px}
+  #pm .ft{padding:14px;border-top:1px solid var(--line);font-size:14px}
+  #pm .ft .ic{font-size:22px;display:flex;gap:16px;margin-bottom:8px}
+  #pm .ft .ic i{font-style:normal;cursor:none}
+  #pm .ft .ic i.on{color:var(--pink)}
+  #pm .x{position:absolute;right:18px;top:12px;font-size:34px;color:#fff;cursor:none}
+  @media(max-width:800px){#pm .box{grid-template-columns:1fr;max-height:92vh}#pm .im img{max-height:52vh}#pm .cm{max-height:120px}}
+
+  /* ===== story viewer ===== */
+  #story{position:fixed;inset:0;z-index:950;background:#000;display:none;place-items:center}
+  #story .fr{position:relative;width:min(100vw,56vh);height:100svh;max-height:100svh;background:#111;overflow:hidden}
+  #story .fr img{width:100%;height:100%;object-fit:cover;display:block}
+  #story .bars{position:absolute;left:8px;right:8px;top:10px;display:flex;gap:4px;z-index:2}
+  #story .bars i{flex:1;height:3px;background:rgba(255,255,255,.35);border-radius:2px;overflow:hidden}
+  #story .bars i b{display:block;height:100%;width:0;background:#fff}
+  #story .sh{position:absolute;left:12px;top:24px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.8);z-index:2}
+  #story .sh img{width:34px;height:34px;border-radius:50%;object-fit:cover;padding:2px;background:var(--ig)}
+  #story .cap{position:absolute;left:16px;right:16px;bottom:34px;font-family:"Instrument Serif",serif;font-style:italic;font-size:clamp(22px,3vw,34px);text-shadow:0 2px 20px rgba(0,0,0,.9);z-index:2;line-height:1.1}
+  #story .x{position:absolute;right:14px;top:22px;font-size:30px;z-index:3;cursor:none}
+  #story .fr::before,#story .fr::after{content:"";position:absolute;top:0;bottom:0;width:35%;z-index:1}
+  #story .fr::before{left:0}#story .fr::after{right:0}
+
+  /* ===== insights ===== */
+  #insights{background:var(--marble);color:#111;padding:110px 0;position:relative;overflow:hidden}
+  #insights .tag{color:#666}
+  #insights h2{font-size:clamp(40px,5vw,72px)}
+  .ins{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px}
+  .in{background:#fff;border-radius:18px;padding:20px 20px 16px;box-shadow:0 20px 50px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.06)}
+  .in span{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#777}
+  .in b{display:block;font-size:clamp(28px,3vw,44px);font-weight:900;letter-spacing:-.03em;margin:6px 0 10px;color:#111}
+  .in b sub{font-size:.45em}
+  .in .bars{display:flex;gap:4px;align-items:flex-end;height:44px}
+  .in .bars i{flex:1;background:var(--ig);border-radius:3px 3px 0 0;transform-origin:bottom;transform:scaleY(0)}
+  @media(max-width:800px){.ins{grid-template-columns:repeat(2,1fr)}}
+  #insights .src{margin-top:14px;font-size:12px;color:#777;letter-spacing:.1em;text-transform:uppercase}
+
+  /* ===== follow him (how to buy) ===== */
+  #follow{background:var(--bg);padding:120px 0;position:relative;overflow:hidden}
+  #follow h2{font-size:clamp(44px,5.6vw,84px)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 20px}
+  @media(max-width:800px){.steps{grid-template-columns:1fr}}
+  .st{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:22px;position:relative;overflow:hidden}
+  .st::before{content:attr(data-n);position:absolute;right:14px;top:6px;font-family:"Instrument Serif",serif;font-style:italic;font-size:70px;color:rgba(255,255,255,.08);line-height:1}
+  .st h3{margin:0 0 6px;font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .st p{margin:0;color:var(--muted);font-size:14px}
+  .dm{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;background:#fff;color:#111;border-radius:22px 22px 22px 6px;padding:16px 18px;max-width:760px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+  .dm .lbl{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--pink)}
+  .dm code{display:block;font-family:ui-monospace,Menlo,monospace;font-size:clamp(13px,1.5vw,18px);word-break:break-all;margin-top:4px}
+  .dm button{background:#111;color:#fff;border:0;border-radius:999px;padding:12px 18px;font-weight:800;cursor:none}
+  @media(max-width:600px){.dm{grid-template-columns:1fr}}
+  #follow .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+
+  footer{background:#000;padding:90px 0 40px;position:relative;overflow:hidden}
+  .refl{position:relative;font-family:"Instrument Serif",serif;font-style:italic;font-size:clamp(70px,15vw,250px);line-height:.85;letter-spacing:-.03em;color:#fff;white-space:nowrap}
+  .refl span{display:block}
+  .refl span+span{transform:scaleY(-1);opacity:.35;-webkit-mask-image:linear-gradient(180deg,transparent 10%,#000 90%);mask-image:linear-gradient(180deg,transparent 10%,#000 90%);filter:blur(1px)}
+  footer .fr{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:30px;font-size:13px;color:var(--muted)}
+  footer .fr a:hover{color:#fff}
+  footer .fine{font-size:11px;color:#555;margin-top:16px;max-width:90ch;line-height:1.6}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="cur"></div><div id="dim"></div>
+<div id="on"><div class="ring"><img src="assets/pfp.jpg" alt=""></div><div class="t">he's ready.</div><div class="skip">click to skip</div></div>
+
+<nav><a class="logo" href="#profile">narcissus</a><div class="links"><a href="#pool">the pool</a><a href="#followers">followers</a><a href="#posts">posts</a><a href="#follow">follow him</a><a id="nav-x" href="#" target="_blank" rel="noopener">X</a></div></nav>
+
+<!-- PROFILE -->
+<section id="profile">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="ph">
+      <div class="avatar" id="avatar"><img src="assets/pfp.jpg" alt=""><span class="live">LIVE</span></div>
+      <div class="who">
+        <div class="name"><h1>narcissus</h1><span class="vb" id="vb">✓</span>
+          <div class="acts"><a class="btn ig magnet" id="buy1" href="#" target="_blank" rel="noopener">Follow</a><a class="btn ghost magnet" id="chart" href="#" target="_blank" rel="noopener">Message</a><a class="btn ghost magnet" id="x2" href="#" target="_blank" rel="noopener">···</a></div>
+        </div>
+        <div class="stats"><div><b id="s-posts">6</b>posts</div><div><b id="s-fol">0</b>followers</div><div><b>1</b>following</div></div>
+        <div class="bio"><b>Narcissus</b> · him<br>looked at himself once. still looking.<br>3,000 years on the front camera. <b>$NARCISSUS</b> · paired with instagram<br><a id="bio-link" href="#follow">follow him ↓</a></div>
+        <div class="hl" id="hl"></div>
+      </div>
+    </div>
+    <div class="big">
+      <h2 id="h1">COULDN'T STOP LOOKING AT HIMSELF. <i>NOW IT'S AN APP.</i></h2>
+      <p>he leaned over a pool, saw his face, and never got up. that was the first feed. <b>every buy is a like. followers = market cap. he follows one account: his own.</b></p>
+    </div>
+  </div>
+</section>
+
+<div class="mq"><div id="mq"></div></div>
+
+<!-- THE POOL -->
+<section id="pool">
+  <div class="wrap grid">
+    <div>
+      <span class="tag">the pool · 3,000 years ago</span>
+      <h2>the first <i>front camera.</i></h2>
+      <p>greece. a quiet pool. he leaned over for a drink and saw the most beautiful thing he'd ever seen. <b>he stayed. he's still there. touch the water — he hates ripples.</b></p>
+    </div>
+    <div class="mirror" id="mirror"><img src="assets/pfp.jpg" alt="" id="mimg"><canvas id="water"></canvas><span class="lbl">touch the water</span></div>
+  </div>
+</section>
+
+<!-- FOLLOWERS -->
+<section id="followers">
+  <div class="wrap grid">
+    <div>
+      <span class="tag">followers · market cap</span>
+      <h2>the follower <i>count.</i></h2>
+      <p class="lead">followers are the market cap. every stop is a new tier and a marketing move. verified at $100K. he has never followed anyone back.</p>
+      <div class="fcount"><span id="fbig">0</span><small>followers · live</small></div>
+      <div class="whatif">what if the market cap were <input id="wi" type="range" min="3" max="7.5" step="0.01" value="3"><output id="wio">$1K</output><button type="button" id="wiclear">reset</button></div>
+    </div>
+    <div class="notes" id="notes"></div>
+  </div>
+</section>
+
+<!-- POSTS -->
+<section id="posts">
+  <div class="wrap">
+    <div class="tabs"><span class="on">▦ posts</span><span>▶ reels</span><span>◫ tagged (himself)</span></div>
+    <div class="grid3" id="grid"></div>
+  </div>
+</section>
+
+<!-- INSIGHTS -->
+<section id="insights">
+  <div class="wrap">
+    <span class="tag">insights · last 24h</span>
+    <h2>professional dashboard. <i>professional.</i></h2>
+    <div class="ins">
+      <div class="in"><span>reach (market cap)</span><b id="k-mcap">—</b><div class="bars" data-k="1"></div></div>
+      <div class="in"><span>price</span><b id="k-price">—</b><div class="bars" data-k="2"></div></div>
+      <div class="in"><span>likes (buys 24h)</span><b id="k-buys">—</b><div class="bars" data-k="3"></div></div>
+      <div class="in"><span>unfollows (sells 24h)</span><b id="k-sells">—</b><div class="bars" data-k="4"></div></div>
+    </div>
+    <div class="src" id="src">waiting for the first like…</div>
+  </div>
+</section>
+
+<!-- FOLLOW HIM -->
+<section id="follow">
+  <div class="wrap">
+    <span class="tag">how to follow him</span>
+    <h2>follow <i>him.</i></h2>
+    <div class="steps">
+      <div class="st" data-n="1"><h3>get a wallet</h3><p>phantom or solflare. put some SOL in it. that's your account.</p></div>
+      <div class="st" data-n="2"><h3>open the launchpad</h3><p>hit Follow, paste his handle below, pick an amount. that's the like.</p></div>
+      <div class="st" data-n="3"><h3>keep looking</h3><p>every stop the market cap passes, another tier. sell and he loses a follower. he notices.</p></div>
+    </div>
+    <div class="dm"><div><div class="lbl">his handle · contract address</div><code id="ca">drops at launch. he's still fixing his hair.</code></div><button type="button" id="copy">copy</button></div>
+    <div class="row"><a class="btn ig magnet" id="buy2" href="#" target="_blank" rel="noopener">Follow</a><a class="btn ghost magnet" id="chart2" href="#" target="_blank" rel="noopener">chart</a><a class="btn ghost magnet" id="x3" href="#" target="_blank" rel="noopener">X</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="refl"><span>narcissus</span><span>narcissus</span></div>
+    <div class="fr"><span>$NARCISSUS · paired with instagram · he follows one account</span><span><a id="x4" href="#" target="_blank" rel="noopener">X</a> · <a id="buy3" href="#" target="_blank" rel="noopener">follow him</a> · <a id="chart3" href="#" target="_blank" rel="noopener">chart</a> · <a href="#profile">top</a></span></div>
+    <p class="fine">*he is not verified. he is marble. the pool has declined to comment. no reflections were harmed. this is a meme coin with a statue on it. paired with instagram means he is on instagram; instagram has not been informed.</p>
+  </div>
+</footer>
+
+<div id="pm"><span class="x" id="pmx">×</span><div class="box"><div class="im" id="pmim"><img alt=""></div><div class="side"><div class="hd"><img src="assets/pfp.jpg" alt="">narcissus <span style="color:#0095f6" id="pmvb"></span></div><div class="cm" id="pmcm"></div><div class="ft"><div class="ic"><i id="pmlike">♡</i><i>💬</i><i>➤</i></div><div id="pmlikes">liked by <b>narcissus</b> and <b>—</b> others</div><div id="pmcap" style="margin-top:6px;color:#ddd"></div></div></div></div></div>
+<div id="story"><div class="fr"><div class="bars" id="sbars"></div><div class="sh"><img src="assets/pfp.jpg" alt="">narcissus <span style="color:#aaa;font-weight:400" id="stime">now</span></div><img id="simg" alt=""><div class="cap" id="scap"></div><span class="x" id="sx">×</span></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const CFG=Object.assign({CA:"",CHAIN:"solana",PAD:"pumpfun",X:"https://x.com/",BUY:"",CHART:""},window.NARCISSUS_CFG||{});
+const sol=CFG.CHAIN!=="robinhood";
+const PADS={pons:ca=>`https://www.ponsfamily.com/launchpad/${ca}`,pumpfun:ca=>`https://pump.fun/coin/${ca}`,stonkfun:ca=>`https://www.stonkfun.xyz/token/${ca}`};
+const buyUrl=CFG.BUY||(CFG.CA?(PADS[CFG.PAD]||PADS[sol?"pumpfun":"pons"])(CFG.CA):"#follow");
+const chartUrl=CFG.CHART||(CFG.CA?(sol?`https://gmgn.ai/sol/token/${CFG.CA}`:`https://dexscreener.com/search?q=${CFG.CA}`):"#insights");
+["buy1","buy2","buy3"].forEach(id=>$("#"+id).href=buyUrl); ["chart","chart2","chart3"].forEach(id=>$("#"+id).href=chartUrl); ["nav-x","x2","x3","x4"].forEach(id=>$("#"+id).href=CFG.X);
+if(CFG.CA) $("#ca").textContent=CFG.CA;
+$("#copy").addEventListener("click",()=>{ if(!CFG.CA){ toast("not yet. he's still fixing his hair."); return; } navigator.clipboard?.writeText(CFG.CA); toast("copied. go follow him."); });
+function toast(t){ const el=$("#toast"); el.textContent=t; el.classList.add("on"); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove("on"),2600); }
+const fmtUSD=v=>v>=1e9?"$"+(v/1e9).toFixed(2)+"B":v>=1e6?"$"+(v/1e6).toFixed(2)+"M":v>=1e3?"$"+(v/1e3).toFixed(v>=1e5?0:1)+"K":"$"+Math.round(v);
+const fmtN=v=>v>=1e9?(v/1e9).toFixed(1)+"B":v>=1e6?(v/1e6).toFixed(1)+"M":v>=1e3?(v/1e3).toFixed(v>=1e5?0:1)+"K":String(Math.round(v));
+const fmtP=p=>{ if(!p) return "—"; if(p>=1) return "$"+p.toFixed(2); const s=p.toFixed(10); const m=s.match(/0\.(0*)(\d+)/); if(m&&m[1].length>=3) return `$0.0<sub>${m[1].length}</sub>${m[2].slice(0,4)}`; return "$"+p.toPrecision(3); };
+
+/* ===== smooth scroll ===== */
+let lenis=null; try{ lenis=new Lenis({lerp:.09,smoothWheel:true}); lenis.on("scroll",ScrollTrigger.update); gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0); }catch(e){}
+$$('a[href^="#"]').forEach(a=>{ const id=a.getAttribute("href"); if(id.length<2) return; a.addEventListener("click",e=>{ const el=$(id); if(!el) return; e.preventDefault(); if(lenis) lenis.scrollTo(el,{duration:1.2}); else el.scrollIntoView({behavior:"smooth"}); }); });
+
+/* ===== milestones = follower tiers ===== */
+const M=[[1e4,"1K followers","dexscreener profile paid"],[2.5e4,"2.5K followers","first dex boosts"],[5e4,"5K followers","trending push: boosts + dextools"],[1e5,"10K followers · verified ✓","first KOLs onboarded"],[2.5e5,"25K followers","coingecko + coinmarketcap listings"],[5e5,"50K followers","a famous name follows him"],[1e6,"100K followers · creator fund","billboard in a real city"],[1e7,"1M followers","tier-1 CEX listing"]];
+const frac=mc=>mc<=1000?0:Math.min(1,(Math.log10(mc)-3)/4);
+const stopIndex=mc=>M.filter(([v])=>v<=mc).length;
+let mcapNow=0, buys24=null, sells24=null; const passedSet=new Set();
+$("#notes").innerHTML=M.map(([mc,t,u],i)=>`<div class="note"><img src="assets/pfp.jpg" alt=""><div><b>${t}</b><span>${fmtUSD(mc)} market cap · ${u}</span></div><span class="st">LOCKED</span></div>`).join("");
+function setState(mc,animate=true){ const k=stopIndex(mc); $$(".note").forEach((el,i)=>{ el.classList.toggle("done",i<k); el.classList.toggle("next",i===k); $(".st",el).textContent=i<k?"DONE":i===k?"NEXT":"LOCKED"; });
+  $("#vb").classList.toggle("on",k>=4); $("#pmvb").textContent=k>=4?"✓":""; $("#s-posts").textContent=6+k;
+  const fol={v:+($("#fbig").dataset.v||0)}; gsap.to(fol,{v:mc,duration:animate?1.6:0,ease:"power3.out",onUpdate:()=>{ $("#fbig").textContent=fmtN(fol.v); $("#s-fol").textContent=fmtN(fol.v); $("#fbig").dataset.v=fol.v; }});
+  $("#k-mcap").textContent=mc>0?fmtUSD(mc):"—";
+  if(mcapNow>0){ let top=null; M.forEach(x=>{ if(x[0]<=mc&&!passedSet.has(x[0])){ passedSet.add(x[0]); top=x; } }); if(top){ toast(`${top[1]}. ${top[2]} unlocked.`); heartBurst(innerWidth/2,innerHeight/2,24); bigHeart(innerWidth/2,innerHeight/2); } } else M.forEach(([v])=>{ if(v<=mc) passedSet.add(v); });
+  mcapNow=mc; }
+const wi=$("#wi"); wi.addEventListener("input",()=>{ const mc=Math.pow(10,+wi.value); $("#wio").textContent=fmtUSD(mc); if(+wi.value>3.01){ const k=stopIndex(mc); $$(".note").forEach((el,i)=>{ el.classList.toggle("done",i<k); el.classList.toggle("next",i===k); $(".st",el).textContent=i<k?"DONE":i===k?"NEXT":"LOCKED"; }); $("#fbig").textContent=fmtN(mc); $("#vb").classList.toggle("on",k>=4); } });
+$("#wiclear").addEventListener("click",()=>{ wi.value=3; $("#wio").textContent="$1K"; setState(mcapNow); });
+
+/* ===== stats ===== */
+function paint(price,mcap,vol,src,tx){ price=+price||0; mcap=+mcap||0; buys24=tx?.buys??tx?.h24?.buys??null; sells24=tx?.sells??tx?.h24?.sells??null;
+  $("#k-price").innerHTML=fmtP(price); countTo($("#k-buys"),buys24??0,v=>buys24==null?"—":Math.round(v).toLocaleString()); countTo($("#k-sells"),sells24??0,v=>sells24==null?"—":Math.round(v).toLocaleString());
+  $$(".in .bars").forEach(b=>{ if(!b.children.length) b.innerHTML="<i></i>".repeat(12); gsap.to(b.children,{scaleY:()=>.25+Math.random()*.75,duration:.8,stagger:.04,ease:"power3.out"}); });
+  $("#src").textContent=`insights · ${src} · 24h vol ${fmtUSD(vol||0)} · updates every 30s`;
+  setState(mcap); scheduleHearts(); }
+async function stats(){ if(!CFG.CA) return; try{ const r=await fetch(`https://api.dexscreener.com/latest/dex/tokens/${CFG.CA}`); const j=await r.json(); const p=(j.pairs||[]).sort((a,b)=>(b.liquidity?.usd||0)-(a.liquidity?.usd||0))[0]; if(p){ paint(p.priceUsd,p.fdv??p.marketCap,p.volume?.h24,"dexscreener",p.txns?.h24); return; } }catch{}
+  try{ const net=sol?"solana":"robinhood"; const r=await fetch(`https://api.geckoterminal.com/api/v2/networks/${net}/tokens/${CFG.CA}/pools?page=1`); const j=await r.json(); const p=j.data?.[0]?.attributes; if(p) paint(p.base_token_price_usd,p.fdv_usd??p.market_cap_usd,p.volume_usd?.h24,"geckoterminal",p.transactions?.h24); }catch{} }
+function countTo(el,val,fmt){ const o={v:0}; gsap.to(o,{v:val,duration:1.4,ease:"power3.out",onUpdate:()=>el.textContent=fmt(o.v)}); }
+
+/* ===== hearts (likes = buys) ===== */
+function heart(x,y,big=false){ const h=document.createElement("i"); h.className="heart"; h.textContent="♥"; if(big) h.style.fontSize="34px"; document.body.appendChild(h); gsap.set(h,{x,y}); gsap.to(h,{y:y-160-Math.random()*160,x:x+(Math.random()*80-40),rotate:Math.random()*60-30,opacity:0,duration:1.6+Math.random(),ease:"power1.out",onComplete:()=>h.remove()}); }
+function heartBurst(x,y,n=8){ for(let i=0;i<n;i++) setTimeout(()=>heart(x+(Math.random()*40-20),y,true),i*40); }
+function bigHeart(x,y){ const h=document.createElement("i"); h.className="bigheart"; h.textContent="♥"; document.body.appendChild(h); gsap.set(h,{left:x,top:y}); gsap.timeline({onComplete:()=>h.remove()}).to(h,{scale:1,duration:.35,ease:"back.out(2)"}).to(h,{scale:1.1,opacity:0,duration:.5,delay:.3}); }
+let heartIv=null; function scheduleHearts(){ clearInterval(heartIv); const ms=buys24?gsap.utils.clamp(300,6000,600000/buys24):5000; heartIv=setInterval(()=>heart(innerWidth*.08+Math.random()*innerWidth*.84,innerHeight-20),ms); }
+scheduleHearts();
+
+/* ===== marquee ===== */
+const MQ=["me","also me","still me","he follows 1 account","it's his own","3,000 years on the front camera","every buy is a like","$NARCISSUS","paired with instagram","the pool has no comments section","he turned them off"];
+$("#mq").innerHTML=(MQ.map(t=>`<span>${t} ·</span>`).join("")).repeat(3); gsap.to("#mq",{xPercent:-33.333,duration:30,ease:"none",repeat:-1});
+(function(){ let last=scrollY,v=0; gsap.ticker.add(()=>{ const now=scrollY; v+=((now-last)-v)*.15; last=now; const sk=gsap.utils.clamp(-12,12,v*.3); gsap.set(".mq",{skewX:-sk*.5}); }); })();
+
+/* ===== scenes ===== */
+const SC=[["s01-pool","the pool. day 1. he's still there.","2,041"],["s02-gym","gym. he did one rep. he filmed nine.","1,733"],["s03-date","date night. she left. he didn't notice.","3,120"],["s04-museum","museum. they came to see him. he came to see him.","4,506"],["s05-mirror","mirror. the camera can only take so much.","2,377"],["s06-grwm","grwm. it's marble. there's nothing to get ready.","5,982"]];
+$("#hl").innerHTML=SC.map(([f,c],i)=>`<div data-i="${i}"><i><img src="assets/${f}-t.jpg" alt=""></i>${["the pool","gym","date","museum","mirror","grwm"][i]}</div>`).join("");
+$("#grid").innerHTML=SC.map(([f,c,l],i)=>`<div class="post" data-i="${i}"><img src="assets/${f}-t.jpg" alt=""><div class="ov"><span>${l}</span><span>1</span></div>${i===0?'<span class="pin">📌</span>':''}</div>`).join("");
+const COMMENTS=[["narcissus","me"],["narcissus","still me"],["narcissus","the angle 🔥 (mine)"],["narcissus","who is this guy (it's me)"],["narcissus","liked my own comment"],["narcissus","@narcissus"]];
+function openPost(i){ const [f,c]=SC[i]; $("#pmim img").src=`assets/${f}.jpg`; $("#pmcap").innerHTML=`<b>narcissus</b> ${c}`; $("#pmcm").innerHTML=COMMENTS.slice(0,3+(i%3)).map(([u,t])=>`<div><img src="assets/pfp.jpg" alt=""><span><b>${u}</b>${t}</span></div>`).join(""); $("#pmlikes").innerHTML=`liked by <b>narcissus</b> and <b>${buys24!=null?buys24.toLocaleString():SC[i][2]}</b> others`; $("#pmlike").textContent="♡"; $("#pmlike").classList.remove("on"); $("#pm").style.display="grid"; if(lenis) lenis.stop(); }
+function closePost(){ $("#pm").style.display="none"; if(lenis) lenis.start(); }
+$$(".post").forEach(el=>el.addEventListener("click",()=>openPost(+el.dataset.i)));
+$("#pmx").addEventListener("click",closePost); $("#pm").addEventListener("click",e=>{ if(e.target===$("#pm")) closePost(); });
+let lastTap=0; $("#pmim").addEventListener("click",e=>{ const now=performance.now(); if(now-lastTap<350){ bigHeart(e.clientX,e.clientY); heartBurst(e.clientX,e.clientY,10); $("#pmlike").textContent="♥"; $("#pmlike").classList.add("on"); } lastTap=now; });
+$("#pmlike").addEventListener("click",e=>{ const on=$("#pmlike").classList.toggle("on"); $("#pmlike").textContent=on?"♥":"♡"; if(on) heartBurst(e.clientX,e.clientY,6); });
+$$(".post").forEach((el,i)=>gsap.from(el,{scale:.6,opacity:0,duration:.7,ease:"back.out(1.6)",scrollTrigger:{trigger:el,start:"top 92%"},delay:(i%3)*.1}));
+
+/* ===== story viewer ===== */
+let sIdx=0, sTimer=null;
+$("#sbars").innerHTML=SC.map(()=>"<i><b></b></i>").join("");
+function openStory(i=0){ $("#story").style.display="grid"; if(lenis) lenis.stop(); showSlide(i); }
+function closeStory(){ $("#story").style.display="none"; clearTimeout(sTimer); gsap.killTweensOf("#sbars b"); if(lenis) lenis.start(); }
+function showSlide(i){ if(i<0) i=0; if(i>=SC.length){ closeStory(); return; } sIdx=i; const [f,c]=SC[i]; $("#simg").src=`assets/${f}.jpg`; $("#scap").textContent=c; $("#stime").textContent=["now","2m","14m","1h","3h","yesterday"][i]; gsap.fromTo("#simg",{scale:1.08},{scale:1,duration:4,ease:"none"}); gsap.fromTo("#scap",{y:20,opacity:0},{y:0,opacity:1,duration:.5});
+  $$("#sbars b").forEach((b,j)=>{ gsap.killTweensOf(b); gsap.set(b,{width:j<i?"100%":"0%"}); }); gsap.to($$("#sbars b")[i],{width:"100%",duration:4,ease:"none"}); clearTimeout(sTimer); sTimer=setTimeout(()=>showSlide(i+1),4000); }
+$("#avatar").addEventListener("click",()=>openStory(0)); $$("#hl div").forEach(d=>d.addEventListener("click",()=>openStory(+d.dataset.i)));
+$("#sx").addEventListener("click",closeStory);
+$("#story .fr").addEventListener("click",e=>{ if(e.target.id==="sx") return; const r=e.currentTarget.getBoundingClientRect(); showSlide((e.clientX-r.left)<r.width*.35?sIdx-1:sIdx+1); });
+
+/* ===== water reflection (the pool) ===== */
+(function(){ const c=$("#water"), img=$("#mimg"); const W=240,H=120; c.width=W; c.height=H; const x=c.getContext("2d"); const off=document.createElement("canvas"); off.width=W; off.height=H; const ox=off.getContext("2d"); let src=null;
+  let cur=new Float32Array(W*H), prev=new Float32Array(W*H);
+  function draw(){ try{ ox.save(); ox.translate(0,H); ox.scale(1,-1); ox.drawImage(img,0,0,img.naturalWidth,img.naturalHeight*.5,0,0,W,H); ox.restore(); const g=ox.createLinearGradient(0,0,0,H); g.addColorStop(0,"rgba(10,20,30,.15)"); g.addColorStop(1,"rgba(5,10,20,.75)"); ox.fillStyle=g; ox.fillRect(0,0,W,H); src=ox.getImageData(0,0,W,H); }catch(e){ const c2=document.createElement("canvas"); c2.width=W; c2.height=H; const x2=c2.getContext("2d"); const g=x2.createLinearGradient(0,0,0,H); g.addColorStop(0,"#5a6a78"); g.addColorStop(1,"#0a1420"); x2.fillStyle=g; x2.fillRect(0,0,W,H); src=x2.getImageData(0,0,W,H); } }
+  if(img.complete) draw(); else img.addEventListener("load",draw);
+  function drop(px,py,s=6,r=3){ const cx=Math.round(px*W), cy=Math.round(py*H); for(let j=-r;j<=r;j++) for(let i=-r;i<=r;i++){ const X=cx+i,Y=cy+j; if(X>0&&X<W-1&&Y>0&&Y<H-1&&i*i+j*j<=r*r) prev[Y*W+X]+=s; } }
+  let vis=false; ScrollTrigger.create({trigger:"#pool",start:"top bottom",end:"bottom top",onToggle:s=>vis=s.isActive});
+  let f=0; gsap.ticker.add(()=>{ if(!vis||!src) return; if(f++%2) return; for(let i=W;i<W*(H-1);i++){ const v=((prev[i-1]+prev[i+1]+prev[i-W]+prev[i+W])/2-cur[i])*.985; cur[i]=v; } [cur,prev]=[prev,cur];
+    const out=x.createImageData(W,H), o=out.data, s=src.data; for(let yy=1;yy<H-1;yy++) for(let xx=1;xx<W-1;xx++){ const i=yy*W+xx; const dx=(prev[i-1]-prev[i+1])*.6, dy=(prev[i-W]-prev[i+W])*.6; let sx=xx+dx|0, sy=yy+dy|0; if(sx<0) sx=0; if(sx>=W) sx=W-1; if(sy<0) sy=0; if(sy>=H) sy=H-1; const si=(sy*W+sx)*4, oi=i*4; const sh=(prev[i-1]-prev[i+1])*18; o[oi]=s[si]+sh; o[oi+1]=s[si+1]+sh; o[oi+2]=s[si+2]+sh+6; o[oi+3]=255; } x.putImageData(out,0,0); });
+  c.addEventListener("pointermove",e=>{ const r=c.getBoundingClientRect(); drop((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height,3,2); });
+  c.addEventListener("pointerdown",e=>{ const r=c.getBoundingClientRect(); drop((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height,14,5); toast("he felt that."); });
+  setInterval(()=>{ if(vis&&Math.random()<.5) drop(Math.random(),Math.random(),4,2); },1400);
+  window.poolDrop=()=>drop(Math.random(),Math.random(),10,4); })();
+
+/* ===== reveals ===== */
+gsap.utils.toArray("h2:not(#h1)").forEach(h=>gsap.from(h,{y:50,opacity:0,duration:.9,ease:"power3.out",scrollTrigger:{trigger:h,start:"top 88%"}}));
+gsap.utils.toArray(".note,.st,.in,.dm,.mirror,.fcount,.whatif").forEach((el,i)=>gsap.from(el,{y:40,opacity:0,duration:.8,ease:"power3.out",scrollTrigger:{trigger:el,start:"top 92%"},delay:(i%4)*.07}));
+gsap.to("#profile .glow",{x:120,y:60,ease:"none",scrollTrigger:{trigger:"#profile",start:"top top",end:"bottom top",scrub:true}});
+/* avatar tilt */
+(function(){ const a=$("#avatar"); a.addEventListener("mousemove",e=>{ const r=a.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; gsap.to(a,{rotateY:x*30,rotateX:-y*30,duration:.4}); }); a.addEventListener("mouseleave",()=>gsap.to(a,{rotateX:0,rotateY:0,duration:.8,ease:"elastic.out(1,.4)"})); })();
+$$(".magnet").forEach(b=>{ b.addEventListener("mousemove",e=>{ const r=b.getBoundingClientRect(); gsap.to(b,{x:(e.clientX-r.left-r.width/2)*.25,y:(e.clientY-r.top-r.height/2)*.25,duration:.3}); }); b.addEventListener("mouseleave",()=>gsap.to(b,{x:0,y:0,duration:.5,ease:"elastic.out(1,.4)"})); });
+
+/* ===== ring light cursor + dim ===== */
+const cur=$("#cur"); let cx=innerWidth/2,cy=innerHeight/2,tx=cx,ty=cy;
+addEventListener("mousemove",e=>{ tx=e.clientX; ty=e.clientY; },{passive:true});
+gsap.ticker.add(()=>{ cx+=(tx-cx)*.3; cy+=(ty-cy)*.3; cur.style.transform=`translate(${cx}px,${cy}px)`; const s=document.documentElement.style; s.setProperty("--mx",cx+"px"); s.setProperty("--my",cy+"px"); });
+$$("a,button,.post,.avatar,.hl div,#water,.note").forEach(el=>{ el.addEventListener("mouseenter",()=>cur.classList.add("big")); el.addEventListener("mouseleave",()=>cur.classList.remove("big")); });
+let ready=false;
+addEventListener("mousedown",e=>{ if(!ready) return; if(e.target.closest("#pm,#story")) return; heartBurst(e.clientX,e.clientY,6); });
+
+/* ===== hero words ===== */
+(function(){ const h=$("#h1"); const parts=h.innerHTML.split(/(<i>.*?<\/i>)/); h.innerHTML=parts.map(p=>{ if(p.startsWith("<i>")){ const t=p.replace(/<[^>]+>/g,""); return t.split(" ").map(w=>`<span class="w"><span><i>${w}</i></span></span>`).join(""); } return p.trim().split(/\s+/).filter(Boolean).map(w=>`<span class="w"><span>${w}</span></span>`).join(""); }).join(""); })();
+function heroIn(){ gsap.to("#h1 .w span",{y:0,duration:1,stagger:.06,ease:"power4.out",delay:.3}); gsap.from(".ph > *",{y:30,opacity:0,duration:.9,stagger:.15,ease:"power3.out"}); gsap.from(".big p",{y:20,opacity:0,duration:.8,delay:.9}); gsap.from(".hl div",{scale:.5,opacity:0,duration:.6,stagger:.06,ease:"back.out(2)",delay:.5}); }
+
+/* ===== intro: ring light turns on ===== */
+(function(){ const on=$("#on"); let done=false; const ring=$("#on .ring"); const tl=gsap.timeline({onComplete:finish});
+  tl.to(ring,{opacity:.15,duration:.05},.2).to(ring,{opacity:0,duration:.05}).to(ring,{opacity:.6,duration:.06},.5).to(ring,{opacity:.1,duration:.08}).to(ring,{opacity:1,duration:.15},.85)
+    .to("#on .ring img",{filter:"brightness(1)",scale:1,duration:.7,ease:"power2.out"},1).to("#on .t",{opacity:1,duration:.4},1.4).to({},{duration:.7});
+  function finish(){ if(done) return; done=true; tl.kill(); gsap.to(on,{opacity:0,duration:.5,onComplete:()=>{ on.style.display="none"; ready=true; }}); heroIn(); }
+  on.addEventListener("click",finish); })();
+
+/* init */
+setState(0,false); stats(); setInterval(stats,30000);
+setTimeout(()=>ScrollTrigger.refresh(),800);
+</script>
+</body>
+</html>
