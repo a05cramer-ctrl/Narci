@@ -308,7 +308,7 @@
     <span class="tag">how to follow him</span>
     <h2>follow <i>him.</i></h2>
     <div class="steps">
-      <div class="st" data-n="1"><h3>get a wallet</h3><p>phantom or solflare. put some SOL in it. that's your account.</p></div>
+      <div class="st" data-n="1"><h3>get a wallet</h3><p id="walletStep">phantom or solflare. put some SOL in it. that's your account.</p></div>
       <div class="st" data-n="2"><h3>open the launchpad</h3><p>hit Follow, paste his handle below, pick an amount. that's the like.</p></div>
       <div class="st" data-n="3"><h3>keep looking</h3><p>every stop the market cap passes, another tier. sell and he loses a follower. he notices.</p></div>
     </div>
@@ -335,6 +335,7 @@ gsap.registerPlugin(ScrollTrigger);
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const CFG=Object.assign({CA:"",CHAIN:"solana",PAD:"pumpfun",X:"https://x.com/",BUY:"",CHART:""},window.NARCISSUS_CFG||{});
 const sol=CFG.CHAIN!=="robinhood";
+if(!sol){const w=document.getElementById("walletStep");if(w)w.textContent="metamask or rabby on robinhood chain. that's your account.";}
 const PADS={pons:ca=>`https://www.ponsfamily.com/launchpad/${ca}`,pumpfun:ca=>`https://pump.fun/coin/${ca}`,stonkfun:ca=>`https://www.stonkfun.xyz/token/${ca}`};
 const buyUrl=CFG.BUY||(CFG.CA?(PADS[CFG.PAD]||PADS[sol?"pumpfun":"pons"])(CFG.CA):"#follow");
 const chartUrl=CFG.CHART||(CFG.CA?(sol?`https://gmgn.ai/sol/token/${CFG.CA}`:`https://dexscreener.com/search?q=${CFG.CA}`):"#insights");
